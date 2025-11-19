@@ -10,19 +10,19 @@
         background: #f1f1f1;
     }
 
+    /* SMALL SEARCH BAR – 20 characters wide */
     .search-container {
         position: relative;
-        width: 100%;
+        width: fit-content; /* only as wide as input */
         margin-bottom: 15px;
     }
 
-    /* Modern search input */
     #searchBox {
-        width: 100%;
-        padding: 10px 35px 10px 10px; /* extra padding for clear icon */
+        width: 20ch; /* EXACT size for 20 letters */
+        padding: 10px 30px 10px 10px;
         font-size: 16px;
         border: 1px solid #ccc;
-        border-radius: 20px; /* rounded like modern apps */
+        border-radius: 20px;
         box-sizing: border-box;
         outline: none;
         transition: box-shadow 0.2s;
@@ -32,17 +32,15 @@
         box-shadow: 0 0 5px rgba(0,0,0,0.2);
     }
 
-    /* Clear button inside input */
+    /* SMALL CLEAR BUTTON INSIDE INPUT */
     #clearBtn {
         position: absolute;
-        right: 12px;
+        right: 10px;
         top: 50%;
         transform: translateY(-50%);
-        width: 18px;
-        height: 18px;
-        border: none;
         background: transparent;
-        font-size: 18px;
+        border: none;
+        font-size: 16px;
         color: #888;
         cursor: pointer;
         display: none;
@@ -82,12 +80,14 @@
 
 <h2>Google Sheet Data (Card View)</h2>
 
+<!-- SMALL SEARCH BAR -->
 <div class="search-container">
     <input type="text" id="searchBox" placeholder="Search...">
     <button id="clearBtn" aria-label="Clear search">&times;</button>
 </div>
 
 <p><small>Auto-refresh every 5 minutes</small></p>
+
 <div id="card-container"></div>
 
 <script>
@@ -109,8 +109,11 @@ function loadData() {
 }
 
 loadData();
+
+// Auto-refresh every 5 minutes
 setInterval(loadData, 5 * 60 * 1000);
 
+// Render cards
 function renderCards(rows) {
     const container = document.getElementById("card-container");
     container.innerHTML = "";
@@ -127,6 +130,7 @@ function renderCards(rows) {
 
             let value = cell;
 
+            // highlight search text
             if (searchTerm) {
                 const regex = new RegExp(`(${searchTerm})`, "gi");
                 value = value.replace(regex, "<mark>$1</mark>");
@@ -144,7 +148,7 @@ function renderCards(rows) {
 const searchBox = document.getElementById("searchBox");
 const clearBtn = document.getElementById("clearBtn");
 
-searchBox.addEventListener("input", function() {
+searchBox.addEventListener("input", function () {
     const keyword = this.value.toLowerCase();
     clearBtn.style.display = keyword ? "block" : "none";
 
@@ -155,14 +159,15 @@ searchBox.addEventListener("input", function() {
     renderCards(filtered);
 });
 
-clearBtn.addEventListener("click", function() {
+clearBtn.addEventListener("click", function () {
     searchBox.value = "";
     clearBtn.style.display = "none";
     renderCards(allRows);
     searchBox.focus();
 });
 
-searchBox.addEventListener("keydown", function(e) {
+// Optional: clear on ESC key
+searchBox.addEventListener("keydown", function (e) {
     if (e.key === "Escape") {
         searchBox.value = "";
         clearBtn.style.display = "none";
