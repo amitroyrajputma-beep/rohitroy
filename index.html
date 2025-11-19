@@ -2,103 +2,28 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Google Sheet Cards</title>
+<title>Google Sheet Cards – Page 1</title>
 <style>
-    body {
-        font-family: Arial, sans-serif;
-        padding: 10px;
-        background: #f1f1f1;
-        text-align: center; /* center search bar */
-    }
-
-    /* CENTERED SEARCH BAR WITH ICONS AND 30-CHAR WIDTH */
-    .search-container {
-        position: relative;
-        width: fit-content;
-        margin: 0 auto 20px auto;
-    }
-
-    #searchBox {
-        width: 30ch; /* <-- NEW width for 30 characters */
-        padding: 10px 35px 10px 35px; /* left & right padding for icons */
-        font-size: 16px;
-        border: 1px solid #ccc;
-        border-radius: 25px;
-        box-sizing: border-box;
-        outline: none;
-        transition: box-shadow 0.2s;
-    }
-
-    #searchBox:focus {
-        box-shadow: 0 0 5px rgba(0,0,0,0.2);
-    }
-
-    /* SEARCH ICON (LEFT) */
-    .search-icon {
-        position: absolute;
-        left: 10px;
-        top: 50%;
-        transform: translateY(-50%);
-        font-size: 18px;
-        color: #777;
-        pointer-events: none;
-    }
-
-    /* CLEAR BUTTON (RIGHT) */
-    #clearBtn {
-        position: absolute;
-        right: 10px;
-        top: 50%;
-        transform: translateY(-50%);
-        background: transparent;
-        border: none;
-        font-size: 18px;
-        color: #777;
-        cursor: pointer;
-        display: none;
-        padding: 0;
-        line-height: 1;
-    }
-
-    #clearBtn:hover {
-        color: #333;
-    }
-
-    /* Card layout */
-    #card-container {
-        text-align: left;
-        margin-top: 15px;
-    }
-
-    .card {
-        background: white;
-        padding: 12px;
-        margin-bottom: 12px;
-        border-radius: 8px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-
-    .card-row {
-        margin-bottom: 6px;
-        font-size: 15px;
-    }
-
-    .card-label {
-        font-weight: bold;
-        color: #555;
-    }
-
-    mark {
-        background: yellow;
-        color: black;
-    }
+    body { font-family: Arial, sans-serif; padding: 10px; background: #f1f1f1; text-align: center; }
+    .search-container { position: relative; width: fit-content; margin: 0 auto 20px auto; }
+    #searchBox { width: 25ch; padding: 10px 35px 10px 35px; font-size: 16px; border: 1px solid #ccc; border-radius: 25px; outline: none; }
+    #searchBox:focus { box-shadow: 0 0 5px rgba(0,0,0,0.2); }
+    .search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 18px; color: #777; pointer-events: none; }
+    #clearBtn { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: transparent; border: none; font-size: 18px; color: #777; cursor: pointer; display: none; padding: 0; }
+    #card-container { text-align: left; margin-top: 20px; }
+    .card { background: white; padding: 12px; margin-bottom: 12px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    .card-row { margin-bottom: 6px; font-size: 15px; }
+    .card-label { font-weight: bold; color: #555; }
+    mark { background: yellow; color: black; }
+    .nav-link { text-decoration: none; color: #0066cc; font-size: 16px; }
+    .nav-link:hover { text-decoration: underline; }
 </style>
 </head>
 <body>
 
-<h2>Google Sheet Data (Card View)</h2>
+<h2>Google Sheet Data (Page 1)</h2>
+<p><a href="page2.html" class="nav-link">Go to Page 2 →</a></p>
 
-<!-- Updated Search Bar (30ch + icons) -->
 <div class="search-container">
     <span class="search-icon">🔍</span>
     <input type="text" id="searchBox" placeholder="Search...">
@@ -111,11 +36,8 @@
 
 <script>
 const CSV_URL = "https://docs.google.com/spreadsheets/d/1cuRsSTamB9qVay6iUTzH-lM-jRAEa6HA56DPS3WqaPQ/export?format=csv&gid=0";
+let headers = [], allRows = [];
 
-let headers = [];
-let allRows = [];
-
-/* Load data */
 function loadData() {
     fetch(CSV_URL)
         .then(res => res.text())
@@ -126,27 +48,25 @@ function loadData() {
             renderCards(allRows);
         });
 }
-
 loadData();
-setInterval(loadData, 5 * 60 * 1000);
+setInterval(loadData, 5*60*1000);
 
-/* Render cards */
 function renderCards(rows) {
     const container = document.getElementById("card-container");
     container.innerHTML = "";
-
     const searchTerm = document.getElementById("searchBox").value.toLowerCase();
 
     rows.forEach(row => {
+        if (row.every(cell => cell.trim() === "")) return; // Skip empty rows
         const card = document.createElement("div");
         card.className = "card";
 
         row.forEach((cell, i) => {
+            if (!cell || cell.trim() === "") return; // Skip empty cells
             const div = document.createElement("div");
             div.className = "card-row";
 
             let value = cell;
-
             if (searchTerm) {
                 const regex = new RegExp(`(${searchTerm})`, "gi");
                 value = value.replace(regex, "<mark>$1</mark>");
@@ -160,237 +80,19 @@ function renderCards(rows) {
     });
 }
 
-/* Search interactions */
 const searchBox = document.getElementById("searchBox");
 const clearBtn = document.getElementById("clearBtn");
 
-searchBox.addEventListener("input", function () {
+searchBox.addEventListener("input", function() {
     const keyword = this.value.toLowerCase();
-
-    /* Show clear button only when typing */
     clearBtn.style.display = keyword ? "block" : "none";
-
-    const filtered = allRows.filter(row =>
-        row.join(" ").toLowerCase().includes(keyword)
-    );
-
+    const filtered = allRows.filter(row => row.join(" ").toLowerCase().includes(keyword));
     renderCards(filtered);
 });
 
-clearBtn.addEventListener("click", function () {
-    searchBox.value = "";
-    clearBtn.style.display = "none";
-    renderCards(allRows);
-    searchBox.focus();
-});
-
-/* ESC key clears search */
-searchBox.addEventListener("keydown", function (e) {
-    if (e.key === "Escape") {
-        searchBox.value = "";
-        clearBtn.style.display = "none";
-        renderCards(allRows);
-    }
-});
+clearBtn.addEventListener("click", function() { searchBox.value = ""; clearBtn.style.display = "none"; renderCards(allRows); searchBox.focus(); });
+searchBox.addEventListener("keydown", function(e) { if (e.key === "Escape") { searchBox.value = ""; clearBtn.style.display = "none"; renderCards(allRows); } });
 </script>
 
 </body>
 </html>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>Google Sheet Cards – Page 2</title>
-<style>
-    body {
-        font-family: Arial, sans-serif;
-        padding: 10px;
-        background: #f1f1f1;
-        text-align: center;
-    }
-
-    .search-container {
-        position: relative;
-        width: fit-content;
-        margin: 0 auto 20px auto;
-    }
-
-    #searchBox {
-        width: 30ch;
-        padding: 10px 35px 10px 35px;
-        font-size: 16px;
-        border: 1px solid #ccc;
-        border-radius: 25px;
-        box-sizing: border-box;
-        outline: none;
-        transition: box-shadow 0.2s;
-    }
-
-    #searchBox:focus {
-        box-shadow: 0 0 5px rgba(0,0,0,0.2);
-    }
-
-    .search-icon {
-        position: absolute;
-        left: 10px;
-        top: 50%;
-        transform: translateY(-50%);
-        font-size: 18px;
-        color: #777;
-        pointer-events: none;
-    }
-
-    #clearBtn {
-        position: absolute;
-        right: 10px;
-        top: 50%;
-        transform: translateY(-50%);
-        background: transparent;
-        border: none;
-        font-size: 18px;
-        color: #777;
-        cursor: pointer;
-        display: none;
-        padding: 0;
-    }
-
-    #card-container {
-        text-align: left;
-        margin-top: 20px;
-    }
-
-    .card {
-        background: white;
-        padding: 12px;
-        margin-bottom: 12px;
-        border-radius: 8px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-
-    .card-row {
-        margin-bottom: 6px;
-        font-size: 15px;
-    }
-
-    .card-label {
-        font-weight: bold;
-        color: #555;
-    }
-
-    mark {
-        background: yellow;
-        color: black;
-    }
-
-    .nav-link {
-        text-decoration: none;
-        color: #0066cc;
-        font-size: 16px;
-    }
-
-    .nav-link:hover {
-        text-decoration: underline;
-    }
-</style>
-</head>
-<body>
-
-<h2>Google Sheet Data (Page 2)</h2>
-
-<p><a href="index.html" class="nav-link">← Back to Page 1</a></p>
-
-<!-- Search Bar -->
-<div class="search-container">
-    <span class="search-icon">🔍</span>
-    <input type="text" id="searchBox" placeholder="Search...">
-    <button id="clearBtn">❌</button>
-</div>
-
-<p><small>Auto-refresh every 5 minutes</small></p>
-
-<div id="card-container"></div>
-
-<script>
-/* Sheet CSV link for PAGE 2 */
-const CSV_URL = "https://docs.google.com/spreadsheets/d/1cuRsSTamB9qVay6iUTzH-lM-jRAEa6HA56DPS3WqaPQ/export?format=csv&gid=1955112487";
-
-let headers = [];
-let allRows = [];
-
-function loadData() {
-    fetch(CSV_URL)
-        .then(res => res.text())
-        .then(csv => {
-            const rows = csv.trim().split("\n").map(r => r.split(","));
-            headers = rows[0];
-            allRows = rows.slice(1);
-            renderCards(allRows);
-        });
-}
-
-loadData();
-setInterval(loadData, 5 * 60 * 1000);
-
-/* Render cards */
-function renderCards(rows) {
-    const container = document.getElementById("card-container");
-    container.innerHTML = "";
-
-    const searchTerm = document.getElementById("searchBox").value.toLowerCase();
-
-    rows.forEach(row => {
-        const card = document.createElement("div");
-        card.className = "card";
-
-        row.forEach((cell, i) => {
-            const div = document.createElement("div");
-            div.className = "card-row";
-            let value = cell;
-
-            if (searchTerm) {
-                const regex = new RegExp(`(${searchTerm})`, "gi");
-                value = value.replace(regex, "<mark>$1</mark>");
-            }
-
-            div.innerHTML = `<span class="card-label">${headers[i]}:</span> ${value}`;
-            card.appendChild(div);
-        });
-
-        container.appendChild(card);
-    });
-}
-
-/* Search + clear */
-const searchBox = document.getElementById("searchBox");
-const clearBtn = document.getElementById("clearBtn");
-
-searchBox.addEventListener("input", function () {
-    const keyword = this.value.toLowerCase();
-    clearBtn.style.display = keyword ? "block" : "none";
-
-    const filtered = allRows.filter(row =>
-        row.join(" ").toLowerCase().includes(keyword)
-    );
-
-    renderCards(filtered);
-});
-
-clearBtn.addEventListener("click", function () {
-    searchBox.value = "";
-    clearBtn.style.display = "none";
-    renderCards(allRows);
-    searchBox.focus();
-});
-
-searchBox.addEventListener("keydown", function (e) {
-    if (e.key === "Escape") {
-        searchBox.value = "";
-        clearBtn.style.display = "none";
-        renderCards(allRows);
-    }
-});
-</script>
-
-</body>
-</html>
-
