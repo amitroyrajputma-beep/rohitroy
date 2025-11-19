@@ -16,26 +16,36 @@
         margin-bottom: 15px;
     }
 
+    /* Modern search input */
     #searchBox {
         width: 100%;
-        padding: 10px 35px 10px 10px; /* space for clear icon */
+        padding: 10px 35px 10px 10px; /* extra padding for clear icon */
         font-size: 16px;
         border: 1px solid #ccc;
-        border-radius: 6px;
+        border-radius: 20px; /* rounded like modern apps */
         box-sizing: border-box;
+        outline: none;
+        transition: box-shadow 0.2s;
     }
 
+    #searchBox:focus {
+        box-shadow: 0 0 5px rgba(0,0,0,0.2);
+    }
+
+    /* Clear button inside input */
     #clearBtn {
         position: absolute;
-        right: 10px;
+        right: 12px;
         top: 50%;
         transform: translateY(-50%);
-        background: transparent;
+        width: 18px;
+        height: 18px;
         border: none;
-        font-size: 16px;
+        background: transparent;
+        font-size: 18px;
         color: #888;
         cursor: pointer;
-        display: none; /* hidden initially */
+        display: none;
         padding: 0;
         line-height: 1;
     }
@@ -54,119 +64,4 @@
 
     .card-row {
         margin-bottom: 6px;
-        font-size: 15px;
-    }
-
-    .card-label {
-        font-weight: bold;
-        color: #555;
-    }
-
-    mark {
-        background: yellow;
-        color: black;
-    }
-</style>
-</head>
-<body>
-
-<h2>Google Sheet Data (Card View)</h2>
-<div class="search-container">
-    <input type="text" id="searchBox" placeholder="Search...">
-    <button id="clearBtn" aria-label="Clear search">&times;</button>
-</div>
-<p><small>Auto-refresh every 5 minutes</small></p>
-
-<div id="card-container"></div>
-
-<script>
-const CSV_URL = "https://docs.google.com/spreadsheets/d/1cuRsSTamB9qVay6iUTzH-lM-jRAEa6HA56DPS3WqaPQ/export?format=csv&gid=0";
-
-let headers = [];
-let allRows = [];
-
-// Load data from Google Sheets
-function loadData() {
-    fetch(CSV_URL)
-        .then(res => res.text())
-        .then(csv => {
-            const rows = csv.trim().split("\n").map(r => r.split(","));
-            headers = rows[0];
-            allRows = rows.slice(1);
-            renderCards(allRows);
-        });
-}
-
-loadData();
-
-// Auto-refresh every 5 minutes
-setInterval(loadData, 5 * 60 * 1000);
-
-// Render cards
-function renderCards(rows) {
-    const container = document.getElementById("card-container");
-    container.innerHTML = "";
-
-    const searchTerm = document.getElementById("searchBox").value.toLowerCase();
-
-    rows.forEach(row => {
-        const card = document.createElement("div");
-        card.className = "card";
-
-        row.forEach((cell, i) => {
-            const div = document.createElement("div");
-            div.className = "card-row";
-
-            let value = cell;
-
-            // highlight search
-            if (searchTerm) {
-                const regex = new RegExp(`(${searchTerm})`, "gi");
-                value = value.replace(regex, "<mark>$1</mark>");
-            }
-
-            div.innerHTML = `<span class="card-label">${headers[i]}:</span> ${value}`;
-            card.appendChild(div);
-        });
-
-        container.appendChild(card);
-    });
-}
-
-// Search functionality
-const searchBox = document.getElementById("searchBox");
-const clearBtn = document.getElementById("clearBtn");
-
-searchBox.addEventListener("input", function () {
-    const keyword = this.value.toLowerCase();
-
-    // Show clear button only if text exists
-    clearBtn.style.display = keyword ? "block" : "none";
-
-    const filtered = allRows.filter(row => 
-        row.join(" ").toLowerCase().includes(keyword)
-    );
-
-    renderCards(filtered);
-});
-
-// Clear button functionality
-clearBtn.addEventListener("click", function () {
-    searchBox.value = "";
-    clearBtn.style.display = "none";
-    renderCards(allRows);
-    searchBox.focus();
-});
-
-// Optional: clear on ESC key press
-searchBox.addEventListener("keydown", function(e) {
-    if (e.key === "Escape") {
-        searchBox.value = "";
-        clearBtn.style.display = "none";
-        renderCards(allRows);
-    }
-});
-</script>
-
-</body>
-</html>
+        f
