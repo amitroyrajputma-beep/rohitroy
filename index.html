@@ -18,10 +18,11 @@
 
     #searchBox {
         width: 100%;
-        padding: 10px 30px 10px 10px; /* right padding for clear icon */
+        padding: 10px 35px 10px 10px; /* space for clear icon */
         font-size: 16px;
         border: 1px solid #ccc;
         border-radius: 6px;
+        box-sizing: border-box;
     }
 
     #clearBtn {
@@ -72,7 +73,7 @@
 <h2>Google Sheet Data (Card View)</h2>
 <div class="search-container">
     <input type="text" id="searchBox" placeholder="Search...">
-    <button id="clearBtn">&times;</button>
+    <button id="clearBtn" aria-label="Clear search">&times;</button>
 </div>
 <p><small>Auto-refresh every 5 minutes</small></p>
 
@@ -132,13 +133,14 @@ function renderCards(rows) {
     });
 }
 
-// Search function
+// Search functionality
 const searchBox = document.getElementById("searchBox");
 const clearBtn = document.getElementById("clearBtn");
 
 searchBox.addEventListener("input", function () {
     const keyword = this.value.toLowerCase();
 
+    // Show clear button only if text exists
     clearBtn.style.display = keyword ? "block" : "none";
 
     const filtered = allRows.filter(row => 
@@ -154,6 +156,15 @@ clearBtn.addEventListener("click", function () {
     clearBtn.style.display = "none";
     renderCards(allRows);
     searchBox.focus();
+});
+
+// Optional: clear on ESC key press
+searchBox.addEventListener("keydown", function(e) {
+    if (e.key === "Escape") {
+        searchBox.value = "";
+        clearBtn.style.display = "none";
+        renderCards(allRows);
+    }
 });
 </script>
 
