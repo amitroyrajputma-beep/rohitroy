@@ -8,21 +8,22 @@
         font-family: Arial, sans-serif;
         padding: 10px;
         background: #f1f1f1;
+        text-align: center; /* center search bar */
     }
 
-    /* SMALL SEARCH BAR – 20 characters wide */
+    /* CENTERED SEARCH BAR WITH ICONS AND 30-CHAR WIDTH */
     .search-container {
         position: relative;
-        width: fit-content; /* only as wide as input */
-        margin-bottom: 15px;
+        width: fit-content;
+        margin: 0 auto 20px auto;
     }
 
     #searchBox {
-        width: 20ch; /* EXACT size for 20 letters */
-        padding: 10px 30px 10px 10px;
+        width: 30ch; /* <-- NEW width for 30 characters */
+        padding: 10px 35px 10px 35px; /* left & right padding for icons */
         font-size: 16px;
         border: 1px solid #ccc;
-        border-radius: 20px;
+        border-radius: 25px;
         box-sizing: border-box;
         outline: none;
         transition: box-shadow 0.2s;
@@ -32,7 +33,18 @@
         box-shadow: 0 0 5px rgba(0,0,0,0.2);
     }
 
-    /* SMALL CLEAR BUTTON INSIDE INPUT */
+    /* SEARCH ICON (LEFT) */
+    .search-icon {
+        position: absolute;
+        left: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 18px;
+        color: #777;
+        pointer-events: none;
+    }
+
+    /* CLEAR BUTTON (RIGHT) */
     #clearBtn {
         position: absolute;
         right: 10px;
@@ -40,8 +52,8 @@
         transform: translateY(-50%);
         background: transparent;
         border: none;
-        font-size: 16px;
-        color: #888;
+        font-size: 18px;
+        color: #777;
         cursor: pointer;
         display: none;
         padding: 0;
@@ -49,7 +61,13 @@
     }
 
     #clearBtn:hover {
-        color: #555;
+        color: #333;
+    }
+
+    /* Card layout */
+    #card-container {
+        text-align: left;
+        margin-top: 15px;
     }
 
     .card {
@@ -80,10 +98,11 @@
 
 <h2>Google Sheet Data (Card View)</h2>
 
-<!-- SMALL SEARCH BAR -->
+<!-- Updated Search Bar (30ch + icons) -->
 <div class="search-container">
+    <span class="search-icon">🔍</span>
     <input type="text" id="searchBox" placeholder="Search...">
-    <button id="clearBtn" aria-label="Clear search">&times;</button>
+    <button id="clearBtn">❌</button>
 </div>
 
 <p><small>Auto-refresh every 5 minutes</small></p>
@@ -96,7 +115,7 @@ const CSV_URL = "https://docs.google.com/spreadsheets/d/1cuRsSTamB9qVay6iUTzH-lM
 let headers = [];
 let allRows = [];
 
-// Load data from Google Sheets
+/* Load data */
 function loadData() {
     fetch(CSV_URL)
         .then(res => res.text())
@@ -109,11 +128,9 @@ function loadData() {
 }
 
 loadData();
-
-// Auto-refresh every 5 minutes
 setInterval(loadData, 5 * 60 * 1000);
 
-// Render cards
+/* Render cards */
 function renderCards(rows) {
     const container = document.getElementById("card-container");
     container.innerHTML = "";
@@ -130,7 +147,6 @@ function renderCards(rows) {
 
             let value = cell;
 
-            // highlight search text
             if (searchTerm) {
                 const regex = new RegExp(`(${searchTerm})`, "gi");
                 value = value.replace(regex, "<mark>$1</mark>");
@@ -144,12 +160,14 @@ function renderCards(rows) {
     });
 }
 
-// Search functionality
+/* Search interactions */
 const searchBox = document.getElementById("searchBox");
 const clearBtn = document.getElementById("clearBtn");
 
 searchBox.addEventListener("input", function () {
     const keyword = this.value.toLowerCase();
+
+    /* Show clear button only when typing */
     clearBtn.style.display = keyword ? "block" : "none";
 
     const filtered = allRows.filter(row =>
@@ -166,7 +184,7 @@ clearBtn.addEventListener("click", function () {
     searchBox.focus();
 });
 
-// Optional: clear on ESC key
+/* ESC key clears search */
 searchBox.addEventListener("keydown", function (e) {
     if (e.key === "Escape") {
         searchBox.value = "";
